@@ -58,32 +58,7 @@ h1{
 .subtitle{
     margin-top:10px;
     opacity:.9;
-    margin-bottom:20px;
-}
-
-/* Tombol Kontrol Musik Baru (Besar & Keren) */
-.music-box {
-    margin-bottom: 30px;
-}
-.audio-control-btn {
-    background: linear-gradient(135deg, #ffcc00, #ff9900);
-    color: #000;
-    border: none;
-    padding: 12px 30px;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 5px 20px rgba(255,204,0,0.4);
-    transition: 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-.audio-control-btn:hover {
-    transform: scale(1.05);
-    background: linear-gradient(135deg, #ffffff, #dddddd);
-    box-shadow: 0 5px 25px rgba(255,255,255,0.6);
+    margin-bottom:35px;
 }
  
 .cards{
@@ -127,21 +102,14 @@ h1{
     display:flex;
     align-items:center;
     justify-content:center;
+    padding:10px;
 }
  
 .front{
-    background: #111;
-    border: 2px solid rgba(255,255,255,.4);
-    box-shadow: 0 0 20px rgba(0,191,255,.3);
-    overflow: hidden;
-}
-
-/* Gambar bendera full kotak penuh */
-.front img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 18px;
+    background: linear-gradient(135deg,#008cff,#0050d8);
+    border:2px solid rgba(255,255,255,.25);
+    box-shadow:0 0 25px rgba(0,191,255,.4);
+    font-size:50px;
 }
  
 .back{
@@ -152,7 +120,6 @@ h1{
     font-size:14px;
     font-weight:700;
     border: 3px solid #FFD700;
-    padding: 10px;
 }
  
 .result{
@@ -224,29 +191,48 @@ h1{
     font-weight:700;
     margin-bottom:10px;
 }
+
+/* Tombol Kontrol Musik Mute/Unmute */
+.audio-control {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.4);
+    padding: 10px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    z-index: 100;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+.audio-control:hover {
+    background: rgba(0,140,255,0.8);
+}
 </style>
 </head>
 <body>
+ 
+<button class="audio-control" id="muteBtn" onclick="toggleMusic()">
+    🎵 Musik: MATI
+</button>
 
 <div class="flags"></div>
  
 <div class="container">
      <div class="badge">🏆 WORLD CUP SPECIAL EVENT</div>
      <h1>⚽ LUCKY FLIP 2026 ⚽</h1>
-     <div class="subtitle">Pilih satu kartu bendera dan menangkan hadiah spesial hingga Rp1.000.000</div>
-     
-     <div class="music-box">
-         <button class="audio-control-btn" id="musicBtn" onclick="toggleMusic()">
-             🎵 HIDUPKAN MUSIK WAKA WAKA
-         </button>
-     </div>
-
+     <div class="subtitle">Pilih satu kartu dan menangkan hadiah spesial hingga Rp1.000.000</div>
      <div class="cards" id="cards"></div>
      <div class="result" id="result"></div>
 </div>
  
 <audio id="bgMusic" loop preload="auto">
-    <source src="waka_waka.mp3" type="audio/mpeg">
+    <source src="https://pub-c5e31b5cdafb419a91624d102b9b080c.r2.dev/shakira_waka_waka.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="flipSound" preload="auto">
@@ -267,7 +253,7 @@ const rewards = [
     {country:"🇦🇷 Argentina",reward:"Rp25.000",weight:20},
     {country:"🇧🇷 Brasil",reward:"Rp50.000",weight:18},
     {country:"🇫🇷 Prancis",reward:"Rp30.000",weight:18},
-    {country:"🇬🇧 Inggris",reward:"Rp20.000",weight:18},
+    {country:"🏴 Inggris",reward:"Rp20.000",weight:18},
     {country:"🇪🇸 Spanyol",reward:"Rp40.000",weight:15},
     {country:"🇩🇪 Jerman",reward:"Rp35.000",weight:15},
     {country:"🇵🇹 Portugal",reward:"Rp75.000",weight:10},
@@ -285,7 +271,6 @@ const rewards = [
     {country:"🏆 Champion",reward:"Rp500.000",weight:2},
     {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
 ];
-
 // Gambar Bendera Kotak Penuh Berkualitas Tinggi (Sesuai Foto 2)
 const flagImages = [
     "https://flagcdn.com/w320/ar.png", "https://flagcdn.com/w320/br.png", 
@@ -299,18 +284,6 @@ const flagImages = [
     "https://flagcdn.com/w320/it.png", "https://flagcdn.com/w320/ma.png", 
     "https://flagcdn.com/w320/sn.png", "https://flagcdn.com/w320/ca.png"
 ];
-
-function shuffleArray(array) {
-    let currentIndex = array.length, randomIndex;
-    while (currentIndex != 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-    }
-    return array;
-}
-
-const shuffledFlags = shuffleArray([...flagImages]);
  
 function weightedRandom(){
     const total=rewards.reduce((a,b)=>a+b.weight,0);
@@ -324,36 +297,34 @@ function weightedRandom(){
 const cards=document.getElementById("cards");
 const result=document.getElementById("result");
 const bgMusic=document.getElementById("bgMusic");
-const musicBtn=document.getElementById("musicBtn");
+const muteBtn=document.getElementById("muteBtn");
 let played=false;
-let isPlaying=false;
+let isMuted=true;
 
+// Volume lagu Waka Waka disesuaikan agar pas dengan efek suara flip kartu
 bgMusic.volume = 0.5;
 
-// Fungsi kontrol manual tombol musik (ON / OFF)
 function toggleMusic() {
-    if (!isPlaying) {
+    if (isMuted) {
         bgMusic.play().then(() => {
-            musicBtn.innerHTML = "⏸️ MATIKAN MUSIK";
-            musicBtn.style.background = "linear-gradient(135deg, #ffffff, #cccccc)";
-            isPlaying = true;
-        }).catch(e => console.log(e));
+            muteBtn.innerHTML = "🎵 Musik: NYALA";
+            isMuted = false;
+        }).catch(e => {
+            console.log("Audio otomatis ditahan browser sebelum ada interaksi.");
+        });
     } else {
         bgMusic.pause();
-        musicBtn.innerHTML = "🎵 HIDUPKAN MUSIK WAKA WAKA";
-        musicBtn.style.background = "linear-gradient(135deg, #ffcc00, #ff9900)";
-        isPlaying = false;
+        muteBtn.innerHTML = "🎵 Musik: MATI";
+        isMuted = true;
     }
 }
  
 for(let i=0;i<20;i++){
     const card=document.createElement("div");
     card.className="card";
-    card.innerHTML = `
+    card.innerHTML=`
         <div class="card-inner">
-            <div class="front">
-                <img src="${shuffledFlags[i]}" alt="Bendera Negara">
-            </div>
+            <div class="front">⚽</div>
             <div class="back">🏆<br>Kartu Dibuka</div>
         </div>
     `;
@@ -361,6 +332,14 @@ for(let i=0;i<20;i++){
     card.onclick=()=>{
         if(played) return;
         played=true;
+        
+        // Memicu lagu Waka Waka otomatis menyala begitu user melakukan klik pertama pada kartu manapun
+        if(isMuted) { 
+            bgMusic.play().then(() => {
+                muteBtn.innerHTML = "🎵 Musik: NYALA";
+                isMuted = false;
+            }).catch(e => console.log(e));
+        }
  
         const flipSoundClone = document.getElementById("flipSound").cloneNode(true);
         flipSoundClone.volume = 0.7;
