@@ -109,7 +109,7 @@ h1{
     background: linear-gradient(135deg,#008cff,#0050d8);
     border:2px solid rgba(255,255,255,.25);
     box-shadow:0 0 25px rgba(0,191,255,.4);
-    font-size:65px; /* Diperbesar sedikit agar emojinya jelas */
+    font-size:60px; /* Ukuran pas untuk semua layar HP/Laptop */
 }
  
 .back{
@@ -253,7 +253,7 @@ const rewards = [
     {country:"🇦🇷 Argentina",reward:"Rp25.000",weight:20},
     {country:"🇧🇷 Brasil",reward:"Rp50.000",weight:18},
     {country:"🇫🇷 Prancis",reward:"Rp30.000",weight:18},
-    {country:"🏴 Inggris",reward:"Rp20.000",weight:18},
+    {country:"🇬🇧 Inggris",reward:"Rp20.000",weight:18},
     {country:"🇪🇸 Spanyol",reward:"Rp40.000",weight:15},
     {country:"🇩🇪 Jerman",reward:"Rp35.000",weight:15},
     {country:"🇵🇹 Portugal",reward:"Rp75.000",weight:10},
@@ -272,23 +272,24 @@ const rewards = [
     {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
 ];
 
-// List bendera untuk dipasang di bagian depan 20 kartu
+// List 20 bendera aman (Standar ISO) yang dijamin lancar di semua browser
 const cardFlags = [
-    "🇦🇷", "🇧🇷", "🇩🇪", "🇪🇸", "🇫🇷", "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "🇵🇹", "🇳🇱", 
+    "🇦🇷", "🇧🇷", "🇩🇪", "🇪🇸", "🇫🇷", "🇬🇧", "🇵🇹", "🇳🇱", 
     "🇧🇪", "🇭🇷", "🇯🇵", "🇰🇷", "🇨🇭", "🇺🇸", "🇲🇽", "🇺🇾",
     "🇮🇹", "🇲🇦", "🇸🇳", "🇨🇦"
 ];
 
-// Fungsi untuk mengacak posisi bendera di awal permainan
+// Fungsi acak urutan bendera
 function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
     }
     return array;
 }
 
-// Acak urutan bendera
 const shuffledFlags = shuffleArray([...cardFlags]);
  
 function weightedRandom(){
@@ -303,3 +304,94 @@ function weightedRandom(){
 const cards=document.getElementById("cards");
 const result=document.getElementById("result");
 const bgMusic=document.getElementById("bgMusic");
+const muteBtn=document.getElementById("muteBtn");
+let played=false;
+let isMuted=true;
+
+bgMusic.volume = 0.5;
+
+function toggleMusic() {
+    if (isMuted) {
+        bgMusic.play().then(() => {
+            muteBtn.innerHTML = "🎵 Musik: NYALA";
+            isMuted = false;
+        }).catch(e => console.log(e));
+    } else {
+        bgMusic.pause();
+        muteBtn.innerHTML = "🎵 Musik: MATI";
+        isMuted = true;
+    }
+}
+ 
+// Generate 20 kartu ke dalam grid
+for(let i=0;i<20;i++){
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML = `
+        <div class="card-inner">
+            <div class="front">${shuffledFlags[i]}</div>
+            <div class="back">🏆<br>Kartu Dibuka</div>
+        </div>
+    `;
+ 
+    card.onclick=()=>{
+        if(played) return;
+        played=true;
+        
+        if(isMuted) { 
+            bgMusic.play().then(() => {
+                muteBtn.innerHTML = "🎵 Musik: NYALA";
+                isMuted = false;
+            }).catch(e => console.log(e));
+        }
+ 
+        const flipSoundClone = document.getElementById("flipSound").cloneNode(true);
+        flipSoundClone.volume = 0.7;
+        flipSoundClone.play();
+ 
+        const hadiah=weightedRandom();
+        card.classList.add("flip");
+ 
+        setTimeout(()=>{
+            const jackpot = hadiah.reward === "Rp1.000.000";
+            
+            if(jackpot) {
+                const jackpotSound = document.getElementById("jackpotSound").cloneNode(true);
+                jackpotSound.play();
+                
+                let duration = 3 * 1000;
+                let end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                }());
+            } else {
+                const winSoundClone = document.getElementById("winSound").cloneNode(true);
+                winSoundClone.play();
+                
+                confetti({ particleCount:150, spread:100, origin:{y:.6} });
+            }
+ 
+            result.style.display="block";
+            result.className = jackpot ? "result win" : "result";
+            
+            result.innerHTML=`
+                <h2>🎉 SELAMAT 🎉</h2>
+                <div class="country">${hadiah.country}</div>
+                <div class="reward">${hadiah.reward}</div>
+                <p style="margin-top:10px; color:#fff; opacity:0.8;">Hadiah berhasil diklaim ke akun Anda</p>
+                <button class="play-again" onclick="location.reload()">Main Lagi</button>
+            `;
+ 
+            window.scrollTo({ top:document.body.scrollHeight, behavior:'smooth' });
+        }, 600);
+    };
+ 
+    cards.appendChild(card);
+}
+</script>
+ 
+</body>
+</html>
