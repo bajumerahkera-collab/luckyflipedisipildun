@@ -15,6 +15,11 @@
     padding:0;
     box-sizing:border-box;
     font-family:'Poppins',sans-serif;
+    /* 🚫 Matikan fitur seleksi teks agar tidak bisa di-copy paste teksnya */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
  
 body{
@@ -67,7 +72,6 @@ h1{
     margin-bottom:35px;
 }
 
-/* 🎵 TOMBOL MUSIK KAPSUL PRESISI */
 .audio-control {
     position: fixed;
     top: 20px;
@@ -233,7 +237,6 @@ h1{
     margin-bottom:10px;
 }
 
-/* 🔐 POP-UP STYLES USER ID */
 .login-overlay {
     position: fixed;
     inset: 0;
@@ -358,6 +361,37 @@ h1{
 // 🔗 TARGET DIRECT SITUS UTAMA BAPAK
 const TARGET_SITE_URL = "https://suratjujur.com/";
 
+/* =======================================================
+   🛡️ PROTEKSI SISTEM KEAMANAN (ANTI-INTIP & ANTI-F12)
+   ======================================================= */
+// 1. Matikan Klik Kanan
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+// 2. Blokir Kombinasi Tombol F12, Ctrl+U, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+S
+document.onkeydown = function(e) {
+    if (e.keyCode == 123) { return false; } // F12
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; } // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; } // Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; } // Ctrl+Shift+J
+    if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; } // Ctrl+U
+    if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) { return false; } // Ctrl+S
+};
+
+// 3. Jebakan Jika DevTools Terbuka Sengaja Lewat Menu Atas Browser
+setInterval(function() {
+    let before = new Date().getTime();
+    debugger; // Membekukan browser jika inspect element menyala
+    let after = new Date().getTime();
+    if (after - before > 100) {
+        // Jika ketahuan inspect element terbuka lama, paksa reload halaman
+        window.location.reload();
+    }
+}, 1000);
+
+
+/* =======================================================
+   🎮 CORE GAME SCRIPT
+   ======================================================= */
 const rewards = [
     {country:"🇦🇷 Argentina",reward:"Rp25.000",weight:20},
     {country:"🇧🇷 Brasil",reward:"Rp50.000",weight:18},
@@ -428,7 +462,7 @@ let isPlaying=false;
  
 bgMusic.volume = 0.5;
 
-// Proteksi Cek Status Pas Load Halaman (Mencegah refresh ganti hadiah)
+// Proteksi Cek Status Pas Load Halaman
 window.onload = () => {
     const savedStatus = localStorage.getItem("lucky_flip_status");
     if (savedStatus === "claimed") {
@@ -439,10 +473,7 @@ window.onload = () => {
         mainContainer.classList.remove("content-blur");
         played = true;
         
-        // Sembunyikan tumpukan kartu lama karena sudah diklaim
         cards.style.display = "none";
-        
-        // Paksa tampilkan hadiah lama saja secara permanen (Anti Ganti Hadiah)
         result.style.display = "block";
         if(savedReward === "Rp1.000.000") result.className = "result win";
         
@@ -466,12 +497,11 @@ function submitLogin() {
         return;
     }
     
-    // Cek apakah User ID ini yang sebelumnya sudah mengklaim
     const oldUser = localStorage.getItem("lucky_flip_userid");
     if(oldUser && oldUser === userIdValue) {
         alert("User ID ini sudah pernah melakukan klaim hadiah!");
         localStorage.setItem("lucky_flip_status", "claimed");
-        location.reload(); // Paksa reload untuk mengunci view
+        location.reload();
         return;
     }
     
@@ -516,7 +546,6 @@ for(let i=0;i<20;i++){
         const hadiah=weightedRandom();
         card.classList.add("flip");
  
-        // 🔐 SIMPAN DATA LANGSUNG SAAT KARTU DIKLIK (Mencegah refresh licik)
         const currentUser = userIdInput.value.trim().toLowerCase();
         localStorage.setItem("lucky_flip_status", "claimed");
         localStorage.setItem("lucky_flip_userid", currentUser);
