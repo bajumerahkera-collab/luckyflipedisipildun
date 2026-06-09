@@ -109,7 +109,7 @@ h1{
     background: linear-gradient(135deg,#008cff,#0050d8);
     border:2px solid rgba(255,255,255,.25);
     box-shadow:0 0 25px rgba(0,191,255,.4);
-    font-size:50px;
+    font-size:60px; /* Ukuran pas untuk semua layar HP/Laptop */
 }
  
 .back{
@@ -253,7 +253,7 @@ const rewards = [
     {country:"🇦🇷 Argentina",reward:"Rp25.000",weight:20},
     {country:"🇧🇷 Brasil",reward:"Rp50.000",weight:18},
     {country:"🇫🇷 Prancis",reward:"Rp30.000",weight:18},
-    {country:"🏴 Inggris",reward:"Rp20.000",weight:18},
+    {country:"🇬🇧 Inggris",reward:"Rp20.000",weight:18},
     {country:"🇪🇸 Spanyol",reward:"Rp40.000",weight:15},
     {country:"🇩🇪 Jerman",reward:"Rp35.000",weight:15},
     {country:"🇵🇹 Portugal",reward:"Rp75.000",weight:10},
@@ -271,19 +271,26 @@ const rewards = [
     {country:"🏆 Champion",reward:"Rp500.000",weight:2},
     {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
 ];
-// Gambar Bendera Kotak Penuh Berkualitas Tinggi (Sesuai Foto 2)
-const flagImages = [
-    "https://flagcdn.com/w320/ar.png", "https://flagcdn.com/w320/br.png", 
-    "https://flagcdn.com/w320/de.png", "https://flagcdn.com/w320/es.png", 
-    "https://flagcdn.com/w320/fr.png", "https://flagcdn.com/w320/gb.png", 
-    "https://flagcdn.com/w320/pt.png", "https://flagcdn.com/w320/nl.png", 
-    "https://flagcdn.com/w320/be.png", "https://flagcdn.com/w320/hr.png", 
-    "https://flagcdn.com/w320/jp.png", "https://flagcdn.com/w320/kr.png", 
-    "https://flagcdn.com/w320/ch.png", "https://flagcdn.com/w320/us.png", 
-    "https://flagcdn.com/w320/mx.png", "https://flagcdn.com/w320/uy.png", 
-    "https://flagcdn.com/w320/it.png", "https://flagcdn.com/w320/ma.png", 
-    "https://flagcdn.com/w320/sn.png", "https://flagcdn.com/w320/ca.png"
+
+// List 20 bendera aman (Standar ISO) yang dijamin lancar di semua browser
+const cardFlags = [
+    "🇦🇷", "🇧🇷", "🇩🇪", "🇪🇸", "🇫🇷", "🇬🇧", "🇵🇹", "🇳🇱", 
+    "🇧🇪", "🇭🇷", "🇯🇵", "🇰🇷", "🇨🇭", "🇺🇸", "🇲🇽", "🇺🇾",
+    "🇮🇹", "🇲🇦", "🇸🇳", "🇨🇦"
 ];
+
+// Fungsi acak urutan bendera
+function shuffleArray(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex != 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+}
+
+const shuffledFlags = shuffleArray([...cardFlags]);
  
 function weightedRandom(){
     const total=rewards.reduce((a,b)=>a+b.weight,0);
@@ -301,7 +308,6 @@ const muteBtn=document.getElementById("muteBtn");
 let played=false;
 let isMuted=true;
 
-// Volume lagu Waka Waka disesuaikan agar pas dengan efek suara flip kartu
 bgMusic.volume = 0.5;
 
 function toggleMusic() {
@@ -309,9 +315,7 @@ function toggleMusic() {
         bgMusic.play().then(() => {
             muteBtn.innerHTML = "🎵 Musik: NYALA";
             isMuted = false;
-        }).catch(e => {
-            console.log("Audio otomatis ditahan browser sebelum ada interaksi.");
-        });
+        }).catch(e => console.log(e));
     } else {
         bgMusic.pause();
         muteBtn.innerHTML = "🎵 Musik: MATI";
@@ -319,12 +323,13 @@ function toggleMusic() {
     }
 }
  
+// Generate 20 kartu ke dalam grid
 for(let i=0;i<20;i++){
     const card=document.createElement("div");
     card.className="card";
-    card.innerHTML=`
+    card.innerHTML = `
         <div class="card-inner">
-            <div class="front">⚽</div>
+            <div class="front">${shuffledFlags[i]}</div>
             <div class="back">🏆<br>Kartu Dibuka</div>
         </div>
     `;
@@ -333,7 +338,6 @@ for(let i=0;i<20;i++){
         if(played) return;
         played=true;
         
-        // Memicu lagu Waka Waka otomatis menyala begitu user melakukan klik pertama pada kartu manapun
         if(isMuted) { 
             bgMusic.play().then(() => {
                 muteBtn.innerHTML = "🎵 Musik: NYALA";
