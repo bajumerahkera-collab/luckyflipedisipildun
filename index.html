@@ -111,7 +111,7 @@ h1{
     overflow: hidden;
 }
 
-/* Gaya gambar bendera memenuhi kartu di sisi depan */
+/* Gambar bendera full kotak penuh */
 .front img {
     width: 100%;
     height: 100%;
@@ -214,7 +214,7 @@ h1{
 </div>
  
 <audio id="bgMusic" loop preload="auto">
-    <source src="https://pub-c5e31b5cdafb419a91624d102b9b080c.r2.dev/shakira_waka_waka.mp3" type="audio/mpeg">
+    <source src="waka_waka.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="flipSound" preload="auto">
@@ -254,31 +254,20 @@ const rewards = [
     {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
 ];
 
-// URL Gambar Bendera Kotak Penuh Berkualitas Tinggi (Sesuai Foto ke-2)
+// Gambar Bendera Kotak Penuh Berkualitas Tinggi
 const flagImages = [
-    "https://flagcdn.com/w320/ar.png", // Argentina
-    "https://flagcdn.com/w320/br.png", // Brasil
-    "https://flagcdn.com/w320/de.png", // Jerman
-    "https://flagcdn.com/w320/es.png", // Spanyol
-    "https://flagcdn.com/w320/fr.png", // Prancis
-    "https://flagcdn.com/w320/gb.png", // Inggris (UK)
-    "https://flagcdn.com/w320/pt.png", // Portugal
-    "https://flagcdn.com/w320/nl.png", // Belanda
-    "https://flagcdn.com/w320/be.png", // Belgia
-    "https://flagcdn.com/w320/hr.png", // Kroasia
-    "https://flagcdn.com/w320/jp.png", // Jepang
-    "https://flagcdn.com/w320/kr.png", // Korea Selatan
-    "https://flagcdn.com/w320/ch.png", // Swiss
-    "https://flagcdn.com/w320/us.png", // Amerika Serikat
-    "https://flagcdn.com/w320/mx.png", // Meksiko
-    "https://flagcdn.com/w320/uy.png", // Uruguay
-    "https://flagcdn.com/w320/it.png", // Italia
-    "https://flagcdn.com/w320/ma.png", // Maroko
-    "https://flagcdn.com/w320/sn.png", // Senegal
-    "https://flagcdn.com/w320/ca.png"  // Kanada
+    "https://flagcdn.com/w320/ar.png", "https://flagcdn.com/w320/br.png", 
+    "https://flagcdn.com/w320/de.png", "https://flagcdn.com/w320/es.png", 
+    "https://flagcdn.com/w320/fr.png", "https://flagcdn.com/w320/gb.png", 
+    "https://flagcdn.com/w320/pt.png", "https://flagcdn.com/w320/nl.png", 
+    "https://flagcdn.com/w320/be.png", "https://flagcdn.com/w320/hr.png", 
+    "https://flagcdn.com/w320/jp.png", "https://flagcdn.com/w320/kr.png", 
+    "https://flagcdn.com/w320/ch.png", "https://flagcdn.com/w320/us.png", 
+    "https://flagcdn.com/w320/mx.png", "https://flagcdn.com/w320/uy.png", 
+    "https://flagcdn.com/w320/it.png", "https://flagcdn.com/w320/ma.png", 
+    "https://flagcdn.com/w320/sn.png", "https://flagcdn.com/w320/ca.png"
 ];
 
-// Fungsi acak urutan bendera
 function shuffleArray(array) {
     let currentIndex = array.length, randomIndex;
     while (currentIndex != 0) {
@@ -308,16 +297,15 @@ let musicStarted=false;
 
 bgMusic.volume = 0.5;
 
-// Fungsi otomatis putar musik saat interaksi pertama (Klik layar/kartu)
+// Sistem pemicu suara otomatis lewat deteksi interaksi pertama
 function startMusicOnFirstInteraction() {
     if (!musicStarted) {
         bgMusic.play().then(() => {
             musicStarted = true;
-        }).catch(e => console.log("Menunggu interaksi user murni"));
+        }).catch(e => console.log("Menunggu klik user murni"));
     }
 }
  
-// Membuat 20 Kartu ke dalam Grid
 for(let i=0;i<20;i++){
     const card=document.createElement("div");
     card.className="card";
@@ -331,7 +319,6 @@ for(let i=0;i<20;i++){
     `;
  
     card.onclick=(e)=>{
-        // Mencegah double trigger dengan body onclick
         e.stopPropagation(); 
         startMusicOnFirstInteraction();
 
