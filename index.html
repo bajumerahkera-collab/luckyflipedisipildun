@@ -102,14 +102,21 @@ h1{
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:10px;
 }
  
 .front{
-    background: linear-gradient(135deg,#008cff,#0050d8);
-    border:2px solid rgba(255,255,255,.25);
-    box-shadow:0 0 25px rgba(0,191,255,.4);
-    font-size:60px; /* Ukuran pas untuk semua layar HP/Laptop */
+    background: #111;
+    border: 2px solid rgba(255,255,255,.4);
+    box-shadow: 0 0 20px rgba(0,191,255,.3);
+    overflow: hidden;
+}
+
+/* Gaya gambar bendera memenuhi kartu di sisi depan */
+.front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
 }
  
 .back{
@@ -120,6 +127,7 @@ h1{
     font-size:14px;
     font-weight:700;
     border: 3px solid #FFD700;
+    padding: 10px;
 }
  
 .result{
@@ -191,42 +199,16 @@ h1{
     font-weight:700;
     margin-bottom:10px;
 }
-
-/* Tombol Kontrol Musik Mute/Unmute */
-.audio-control {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.6);
-    color: white;
-    border: 2px solid rgba(255,255,255,0.4);
-    padding: 10px 15px;
-    border-radius: 30px;
-    cursor: pointer;
-    z-index: 100;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-}
-.audio-control:hover {
-    background: rgba(0,140,255,0.8);
-}
 </style>
 </head>
-<body>
- 
-<button class="audio-control" id="muteBtn" onclick="toggleMusic()">
-    🎵 Musik: MATI
-</button>
+<body onclick="startMusicOnFirstInteraction()">
 
 <div class="flags"></div>
  
 <div class="container">
      <div class="badge">🏆 WORLD CUP SPECIAL EVENT</div>
      <h1>⚽ LUCKY FLIP 2026 ⚽</h1>
-     <div class="subtitle">Pilih satu kartu dan menangkan hadiah spesial hingga Rp1.000.000</div>
+     <div class="subtitle">Pilih satu kartu bendera dan menangkan hadiah spesial hingga Rp1.000.000</div>
      <div class="cards" id="cards"></div>
      <div class="result" id="result"></div>
 </div>
@@ -272,11 +254,28 @@ const rewards = [
     {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
 ];
 
-// List 20 bendera aman (Standar ISO) yang dijamin lancar di semua browser
-const cardFlags = [
-    "🇦🇷", "🇧🇷", "🇩🇪", "🇪🇸", "🇫🇷", "🇬🇧", "🇵🇹", "🇳🇱", 
-    "🇧🇪", "🇭🇷", "🇯🇵", "🇰🇷", "🇨🇭", "🇺🇸", "🇲🇽", "🇺🇾",
-    "🇮🇹", "🇲🇦", "🇸🇳", "🇨🇦"
+// URL Gambar Bendera Kotak Penuh Berkualitas Tinggi (Sesuai Foto ke-2)
+const flagImages = [
+    "https://flagcdn.com/w320/ar.png", // Argentina
+    "https://flagcdn.com/w320/br.png", // Brasil
+    "https://flagcdn.com/w320/de.png", // Jerman
+    "https://flagcdn.com/w320/es.png", // Spanyol
+    "https://flagcdn.com/w320/fr.png", // Prancis
+    "https://flagcdn.com/w320/gb.png", // Inggris (UK)
+    "https://flagcdn.com/w320/pt.png", // Portugal
+    "https://flagcdn.com/w320/nl.png", // Belanda
+    "https://flagcdn.com/w320/be.png", // Belgia
+    "https://flagcdn.com/w320/hr.png", // Kroasia
+    "https://flagcdn.com/w320/jp.png", // Jepang
+    "https://flagcdn.com/w320/kr.png", // Korea Selatan
+    "https://flagcdn.com/w320/ch.png", // Swiss
+    "https://flagcdn.com/w320/us.png", // Amerika Serikat
+    "https://flagcdn.com/w320/mx.png", // Meksiko
+    "https://flagcdn.com/w320/uy.png", // Uruguay
+    "https://flagcdn.com/w320/it.png", // Italia
+    "https://flagcdn.com/w320/ma.png", // Maroko
+    "https://flagcdn.com/w320/sn.png", // Senegal
+    "https://flagcdn.com/w320/ca.png"  // Kanada
 ];
 
 // Fungsi acak urutan bendera
@@ -290,7 +289,7 @@ function shuffleArray(array) {
     return array;
 }
 
-const shuffledFlags = shuffleArray([...cardFlags]);
+const shuffledFlags = shuffleArray([...flagImages]);
  
 function weightedRandom(){
     const total=rewards.reduce((a,b)=>a+b.weight,0);
@@ -304,46 +303,40 @@ function weightedRandom(){
 const cards=document.getElementById("cards");
 const result=document.getElementById("result");
 const bgMusic=document.getElementById("bgMusic");
-const muteBtn=document.getElementById("muteBtn");
 let played=false;
-let isMuted=true;
+let musicStarted=false;
 
 bgMusic.volume = 0.5;
 
-function toggleMusic() {
-    if (isMuted) {
+// Fungsi otomatis putar musik saat interaksi pertama (Klik layar/kartu)
+function startMusicOnFirstInteraction() {
+    if (!musicStarted) {
         bgMusic.play().then(() => {
-            muteBtn.innerHTML = "🎵 Musik: NYALA";
-            isMuted = false;
-        }).catch(e => console.log(e));
-    } else {
-        bgMusic.pause();
-        muteBtn.innerHTML = "🎵 Musik: MATI";
-        isMuted = true;
+            musicStarted = true;
+        }).catch(e => console.log("Menunggu interaksi user murni"));
     }
 }
  
-// Generate 20 kartu ke dalam grid
+// Membuat 20 Kartu ke dalam Grid
 for(let i=0;i<20;i++){
     const card=document.createElement("div");
     card.className="card";
     card.innerHTML = `
         <div class="card-inner">
-            <div class="front">${shuffledFlags[i]}</div>
+            <div class="front">
+                <img src="${shuffledFlags[i]}" alt="Bendera Negara">
+            </div>
             <div class="back">🏆<br>Kartu Dibuka</div>
         </div>
     `;
  
-    card.onclick=()=>{
+    card.onclick=(e)=>{
+        // Mencegah double trigger dengan body onclick
+        e.stopPropagation(); 
+        startMusicOnFirstInteraction();
+
         if(played) return;
         played=true;
-        
-        if(isMuted) { 
-            bgMusic.play().then(() => {
-                muteBtn.innerHTML = "🎵 Musik: NYALA";
-                isMuted = false;
-            }).catch(e => console.log(e));
-        }
  
         const flipSoundClone = document.getElementById("flipSound").cloneNode(true);
         flipSoundClone.volume = 0.7;
