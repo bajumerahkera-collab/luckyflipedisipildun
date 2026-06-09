@@ -66,11 +66,11 @@ h1{
     position: fixed;
     top: 20px;
     right: 20px;
-    background: rgba(13, 21, 37, 0.7); /* Warna gelap transparan premium */
+    background: rgba(13, 21, 37, 0.7); /* Transparan gelap sesuai gambar */
     color: white;
     border: 1.5px solid rgba(255, 255, 255, 0.3);
     padding: 10px 22px;
-    border-radius: 50px; /* Bentuk Kapsul Sempurna */
+    border-radius: 50px;
     cursor: pointer;
     z-index: 99999;
     font-size: 14px;
@@ -101,7 +101,6 @@ h1{
     cursor:pointer;
 }
 
-/* Efek Hover Kartu */
 .card:hover:not(.flip) .card-inner {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0,191,255,.6);
@@ -138,7 +137,6 @@ h1{
     overflow: hidden;
 }
 
-/* Gambar bendera kotak penuh di sisi depan kartu */
 .front img {
     width: 100%;
     height: 100%;
@@ -253,7 +251,7 @@ h1{
 </audio>
  
 <audio id="winSound" preload="auto">
-    <source src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.min.mp3" type="audio/mpeg">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="jackpotSound" preload="auto">
@@ -272,7 +270,7 @@ const rewards = [
     {country:"🇳🇱 Belanda",reward:"Rp50.000",weight:10},
     {country:"🇧🇪 Belgia",reward:"Rp25.000",weight:10},
     {country:"🇭🇷 Kroasia",reward:"Rp30.000",weight:10},
-    {country:"🇯🇵 Jepang",reward:"Rp50.000",weight:8},
+    {country:"🇯apat",reward:"Rp50.000",weight:8},
     {country:"🇰🇷 Korea",reward:"Rp25.000",weight:8},
     {country:"🇨🇭 Swiss",reward:"Rp40.000",weight:7},
     {country:"🇺🇸 Amerika",reward:"Rp20.000",weight:7},
@@ -327,15 +325,14 @@ let isPlaying=false;
  
 bgMusic.volume = 0.5;
 
-// Fungsi klik tombol manual yang aman & bebas crash browser
 function toggleMusic() {
     if (!isPlaying) {
         bgMusic.play().then(() => {
             musicBtn.innerHTML = "🎵 Musik: NYALA";
             isPlaying = true;
         }).catch(e => {
-            console.log("Gagal putar musik:", e);
-            alert("Gagal memutar! Pastikan file waka_waka.mp3 sudah berada di dalam satu folder yang sama dengan file HTML ini.");
+            console.log("Gagal memutar musik:", e);
+            alert("Tombol aktif! Tapi file 'waka_waka.mp3' belum ketemu. Pastikan nama file MP3 bapak sudah di-rename jadi waka_waka.mp3 dan ditaruh di folder yang sama ya pak!");
         });
     } else {
         bgMusic.pause();
