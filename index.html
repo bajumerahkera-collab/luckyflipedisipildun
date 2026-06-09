@@ -27,7 +27,6 @@ body{
     background-position:center;
 }
  
- 
 .flags{
     position:fixed;
     inset:0;
@@ -62,7 +61,7 @@ h1{
     margin-bottom:35px;
 }
 
-/* 🎵 TOMBOL MUSIK KAPSUL DI POJOK KANAN ATAS (PERSIS SEPERTI GAMBAR BAPAK) */
+/* 🎵 TOMBOL MUSIK KAPSUL DI POJOK KANAN ATAS */
 .audio-control {
     position: fixed;
     top: 20px;
@@ -254,7 +253,7 @@ h1{
 </audio>
  
 <audio id="winSound" preload="auto">
-    <source src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" type="audio/mpeg">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.min.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="jackpotSound" preload="auto">
@@ -285,7 +284,6 @@ const rewards = [
     {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
 ];
 
-// Gambar Bendera Kotak Penuh Berkualitas Tinggi
 const flagImages = [
     "https://flagcdn.com/w320/ar.png", "https://flagcdn.com/w320/br.png", 
     "https://flagcdn.com/w320/de.png", "https://flagcdn.com/w320/es.png", 
@@ -323,32 +321,22 @@ function weightedRandom(){
 const cards=document.getElementById("cards");
 const result=document.getElementById("result");
 const bgMusic=document.getElementById("bgMusic");
- bgMusic.addEventListener("loadeddata", () => {
-    console.log("MP3 berhasil dimuat");
-});
-
-bgMusic.addEventListener("error", (e) => {
-    console.log("MP3 ERROR", e);
-    alert("File musik tidak ditemukan!");
-});
 const musicBtn=document.getElementById("musicBtn");
 let played=false;
 let isPlaying=false;
-document.addEventListener("click", function startMusic() {
-    bgMusic.play().catch(()=>{});
-    musicBtn.innerHTML = "🎵 Musik: NYALA";
-    isPlaying = true;
-    document.removeEventListener("click", startMusic);
-});
  
 bgMusic.volume = 0.5;
 
+// Fungsi klik tombol manual yang aman & bebas crash browser
 function toggleMusic() {
     if (!isPlaying) {
         bgMusic.play().then(() => {
             musicBtn.innerHTML = "🎵 Musik: NYALA";
             isPlaying = true;
-        }).catch(e => console.log(e));
+        }).catch(e => {
+            console.log("Gagal putar musik:", e);
+            alert("Gagal memutar! Pastikan file waka_waka.mp3 sudah berada di dalam satu folder yang sama dengan file HTML ini.");
+        });
     } else {
         bgMusic.pause();
         musicBtn.innerHTML = "🎵 Musik: MATI";
@@ -374,7 +362,7 @@ for(let i=0;i<20;i++){
  
         const flipSoundClone = document.getElementById("flipSound").cloneNode(true);
         flipSoundClone.volume = 0.7;
-        flipSoundClone.play();
+        flipSoundClone.play().catch(()=>{});
  
         const hadiah=weightedRandom();
         card.classList.add("flip");
@@ -384,7 +372,7 @@ for(let i=0;i<20;i++){
             
             if(jackpot) {
                 const jackpotSound = document.getElementById("jackpotSound").cloneNode(true);
-                jackpotSound.play();
+                jackpotSound.play().catch(()=>{});
                 
                 let duration = 3 * 1000;
                 let end = Date.now() + duration;
@@ -396,7 +384,7 @@ for(let i=0;i<20;i++){
                 }());
             } else {
                 const winSoundClone = document.getElementById("winSound").cloneNode(true);
-                winSoundClone.play();
+                winSoundClone.play().catch(()=>{});
                 
                 confetti({ particleCount:150, spread:100, origin:{y:.6} });
             }
