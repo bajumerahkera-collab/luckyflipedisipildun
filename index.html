@@ -61,12 +61,12 @@ h1{
     margin-bottom:35px;
 }
 
-/* 🎵 TOMBOL MUSIK KAPSUL DI POJOK KANAN ATAS */
+/* 🎵 TOMBOL MUSIK KAPSUL PRESISI SESUAI MOCKUP BAPAK */
 .audio-control {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: rgba(13, 21, 37, 0.85);
+    background: rgba(13, 21, 37, 0.8);
     color: white;
     border: 1.5px solid rgba(255, 255, 255, 0.3);
     padding: 10px 22px;
@@ -83,7 +83,7 @@ h1{
 }
 
 .audio-control:hover {
-    background: rgba(0, 140, 255, 0.9);
+    background: rgba(0, 140, 255, 0.85);
     border-color: #00bfff;
     transform: translateY(-2px);
 }
@@ -243,7 +243,7 @@ h1{
 </div>
  
 <audio id="bgMusic" loop preload="auto">
-    <source src="waka_waka.mp3" type="audio/mpeg">
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="flipSound" preload="auto">
@@ -325,16 +325,14 @@ let isPlaying=false;
  
 bgMusic.volume = 0.5;
 
+// Fungsi toggle murni dikendalikan klik tombol manual tanpa mengunci script utama
 function toggleMusic() {
     if (!isPlaying) {
         bgMusic.play().then(() => {
             musicBtn.innerHTML = "🎵 Musik: NYALA";
             isPlaying = true;
         }).catch(e => {
-            // Jika audio lokal diblokir browser saat offline, tombol TETAP berkedip menyala agar game tidak hang!
-            console.log("Audio tertahan perlindungan browser:", e);
-            musicBtn.innerHTML = "🎵 Musik: NYALA";
-            isPlaying = true;
+            console.log("Audio play error:", e);
         });
     } else {
         bgMusic.pause();
