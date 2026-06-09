@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>World Cup Lucky Flip 2026</title>
+ 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+ 
+<!-- Confetti Efek Kemenangan -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+ 
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+ 
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:
+    linear-gradient(rgba(0,38,92,.9),rgba(0,90,180,.9)),
+    url("https://i.ibb.co/Ps16jvyx/image.png");
+    background-size:cover;
+    background-position:center;
+}
+ 
+.flags{
+    position:fixed;
+    inset:0;
+    opacity:.08;
+    pointer-events:none;
+    background-image:
+    repeating-linear-gradient(
+        45deg,
+        transparent 0 50px,
+        rgba(255,255,255,.15) 50px 100px
+    );
+}
+ 
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:40px 20px;
+    text-align:center;
+    color:white;
+}
+ 
+h1{
+    font-size:48px;
+    font-weight:800;
+    text-shadow:0 0 30px #00bfff;
+    letter-spacing: 2px;
+}
+ 
+.subtitle{
+    margin-top:10px;
+    opacity:.9;
+    margin-bottom:35px;
+}
+ 
+.cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:20px;
+    padding: 10px;
+}
+ 
+.card{
+    height:190px;
+    perspective:1200px;
+    cursor:pointer;
+}
+
+/* Efek Hover biar interaktif */
+.card:hover:not(.flip) .card-inner {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,191,255,.6);
+}
+ 
+.card-inner{
+    width:100%;
+    height:100%;
+    position:relative;
+    transform-style:preserve-3d;
+    transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius:20px;
+}
+ 
+.card.flip .card-inner{
+    transform:rotateY(180deg);
+}
+ 
+.front,.back{
+    position:absolute;
+    width:100%;
+    height:100%;
+    border-radius:20px;
+    backface-visibility:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px;
+}
+ 
+.front{
+    background: linear-gradient(135deg,#008cff,#0050d8);
+    border:2px solid rgba(255,255,255,.25);
+    box-shadow:0 0 25px rgba(0,191,255,.4);
+    font-size:50px;
+}
+ 
+.back{
+    background:white;
+    color:#111;
+    transform:rotateY(180deg);
+    flex-direction:column;
+    font-size:14px;
+    font-weight:700;
+    border: 3px solid #FFD700;
+}
+ 
+.result{
+    display:none;
+    margin-top:35px;
+    padding:40px;
+    border-radius:25px;
+    background:rgba(255,255,255,.12);
+    backdrop-filter:blur(12px);
+    border: 1px solid rgba(255,255,255,0.2);
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+ 
+.win{
+    background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,140,0,0.2));
+    backdrop-filter:blur(12px);
+    border: 2px solid gold;
+    animation: glow 1s infinite alternate, fadeIn 0.5s ease;
+}
+ 
+@keyframes glow{
+    from{ box-shadow:0 0 20px gold; }
+    to{ box-shadow:0 0 50px gold; }
+}
+ 
+.reward{
+    font-size:42px;
+    font-weight:800;
+    color:#FFD700;
+    margin-top:10px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+ 
+.country{
+    font-size:28px;
+    margin-top:10px;
+}
+ 
+.play-again{
+    margin-top:25px;
+    padding:14px 40px;
+    border:none;
+    border-radius:15px;
+    background:#FFD700;
+    color: #000;
+    font-weight:800;
+    cursor:pointer;
+    font-size:16px;
+    transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(255,215,0,0.4);
+}
+
+.play-again:hover {
+    background: #fff;
+    transform: scale(1.05);
+}
+ 
+.badge{
+    display:inline-block;
+    padding:10px 20px;
+    background:#ffcc00;
+    color:#000;
+    border-radius:999px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+/* Tombol Kontrol Musik Mute/Unmute */
+.audio-control {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.6);
+    color: white;
+    border: 2px solid rgba(255,255,255,0.4);
+    padding: 10px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    z-index: 100;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+.audio-control:hover {
+    background: rgba(0,140,255,0.8);
+}
+</style>
+</head>
+<body>
+ 
+<button class="audio-control" id="muteBtn" onclick="toggleMusic()">
+    🎵 Musik: MATI
+</button>
+
+<div class="flags"></div>
+ 
+<div class="container">
+     <div class="badge">🏆 WORLD CUP SPECIAL EVENT</div>
+     <h1>⚽ LUCKY FLIP 2026 ⚽</h1>
+     <div class="subtitle">Pilih satu kartu dan menangkan hadiah spesial hingga Rp1.000.000</div>
+     <div class="cards" id="cards"></div>
+     <div class="result" id="result"></div>
+</div>
+ 
+<!-- ELEMEN AUDIO -->
+<!-- Musik Latar (Stadion / Anthem) -->
+<audio id="bgMusic" loop>
+    <source src="https://audio.com/adventure-waterpark-desaru-coast-it/audio/6-shakira-waka-waka-this-time-for-africa-lyrics-320-kbps" type="audio/mpeg">
+</audio>
+
+<!-- Efek Balik Kartu -->
+<audio id="flipSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg">
+</audio>
+ 
+<!-- Efek Menang Kebisingan / Peluit / Sorak Penonton -->
+<audio id="winSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" type="audio/mpeg">
+</audio>
+
+<!-- Efek Khusus Jackpot Rp1.000.000 (Tepuk Tangan Meriah) -->
+<audio id="jackpotSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3" type="audio/mpeg">
+</audio>
+ 
+<script>
+ 
+const rewards = [
+    {country:"🇦🇷 Argentina",reward:"Rp25.000",weight:20},
+    {country:"🇧🇷 Brasil",reward:"Rp50.000",weight:18},
+    {country:"🇫🇷 Prancis",reward:"Rp30.000",weight:18},
+    {country:"🏴 Inggris",reward:"Rp20.000",weight:18},
+    {country:"🇪🇸 Spanyol",reward:"Rp40.000",weight:15},
+    {country:"🇩🇪 Jerman",reward:"Rp35.000",weight:15},
+    {country:"🇵🇹 Portugal",reward:"Rp75.000",weight:10},
+    {country:"🇳🇱 Belanda",reward:"Rp50.000",weight:10},
+    {country:"🇧🇪 Belgia",reward:"Rp25.000",weight:10},
+    {country:"🇭🇷 Kroasia",reward:"Rp30.000",weight:10},
+    {country:"🇯🇵 Jepang",reward:"Rp50.000",weight:8},
+    {country:"🇰🇷 Korea",reward:"Rp25.000",weight:8},
+    {country:"🇨🇭 Swiss",reward:"Rp40.000",weight:7},
+    {country:"🇺🇸 Amerika",reward:"Rp20.000",weight:7},
+    {country:"🇲🇽 Meksiko",reward:"Rp15.000",weight:7},
+    {country:"🇺🇾 Uruguay",reward:"Rp100.000",weight:5},
+    {country:"⚽ Top Scorer",reward:"Rp150.000",weight:4},
+    {country:"🥈 Runner Up",reward:"Rp250.000",weight:3},
+    {country:"🏆 Champion",reward:"Rp500.000",weight:2},
+    {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
+];
+ 
+function weightedRandom(){
+    const total=rewards.reduce((a,b)=>a+b.weight,0);
+    let random=Math.random()*total;
+    for(let item of rewards){
+        if(random<item.weight) return item;
+        random-=item.weight;
+    }
+}
+ 
+const cards=document.getElementById("cards");
+const result=document.getElementById("result");
+const bgMusic=document.getElementById("bgMusic");
+const muteBtn=document.getElementById("muteBtn");
+let played=false;
+let isMuted=true;
+
+// Mengatur volume musik latar biar tidak terlalu berisik
+bgMusic.volume = 0.4;
+
+function toggleMusic() {
+    if (isMuted) {
+        bgMusic.play().catch(e => console.log("Audio play diblokir oleh browser"));
+        muteBtn.innerHTML = "🎵 Musik: NYALA";
+        isMuted = false;
+    } else {
+        bgMusic.pause();
+        muteBtn.innerHTML = "🎵 Musik: MATI";
+        isMuted = true;
+    }
+}
+ 
+for(let i=0;i<20;i++){
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+        <div class="card-inner">
+            <div class="front">⚽</div>
+            <div class="back">🏆<br>Kartu Dibuka</div>
+        </div>
+    `;
+ 
+    card.onclick=()=>{
+        if(played) return;
+        played=true;
+        
+        // Otomatis nyalakan musik latar jika user belum menyalakannya saat klik kartu pertama
+        if(isMuted) { toggleMusic(); }
+ 
+        // Menggunakan metode cloneNode agar sound langsung berbunyi instan tanpa delay
+        const flipSoundClone = document.getElementById("flipSound").cloneNode(true);
+        flipSoundClone.volume = 0.7;
+        flipSoundClone.play();
+ 
+        const hadiah=weightedRandom();
+        card.classList.add("flip");
+ 
+        setTimeout(()=>{
+            const jackpot = hadiah.reward === "Rp1.000.000";
+            
+            // Putar audio berdasarkan kategori hadiah (Jackpot atau Hadiah Biasa)
+            if(jackpot) {
+                const jackpotSound = document.getElementById("jackpotSound").cloneNode(true);
+                jackpotSound.play();
+                
+                // Efek kembang api confetti berkali-kali untuk jackpot
+                let duration = 3 * 1000;
+                let end = Date.now() + duration;
+
+                (function frame() {
+                    confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+                    confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+                    if (Date.now() < end) { requestAnimationFrame(frame); }
+                }());
+            } else {
+                const winSoundClone = document.getElementById("winSound").cloneNode(true);
+                winSoundClone.play();
+                
+                // Confetti standar
+                confetti({ particleCount:150, spread:100, origin:{y:.6} });
+            }
+ 
+            result.style.display="block";
+            result.className = jackpot ? "result win" : "result";
+            
+            result.innerHTML=`
+                <h2>🎉 SELAMAT 🎉</h2>
+                <div class="country">${hadiah.country}</div>
+                <div class="reward">${hadiah.reward}</div>
+                <p style="margin-top:10px; color:#fff; opacity:0.8;">Hadiah berhasil diklaim ke akun Anda</p>
+                <button class="play-again" onclick="location.reload()">Main Lagi</button>
+            `;
+ 
+            window.scrollTo({ top:document.body.scrollHeight, behavior:'smooth' });
+        }, 600); // Durasi disesuaikan dengan animasi membalik kartu
+    };
+ 
+    cards.appendChild(card);
+}
+</script>
+ 
+</body>
+</html>
