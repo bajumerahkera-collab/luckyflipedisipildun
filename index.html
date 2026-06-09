@@ -66,7 +66,7 @@ h1{
     position: fixed;
     top: 20px;
     right: 20px;
-    background: rgba(13, 21, 37, 0.7); /* Transparan gelap sesuai gambar */
+    background: rgba(13, 21, 37, 0.85);
     color: white;
     border: 1.5px solid rgba(255, 255, 255, 0.3);
     padding: 10px 22px;
@@ -83,7 +83,7 @@ h1{
 }
 
 .audio-control:hover {
-    background: rgba(0, 140, 255, 0.8);
+    background: rgba(0, 140, 255, 0.9);
     border-color: #00bfff;
     transform: translateY(-2px);
 }
@@ -270,7 +270,7 @@ const rewards = [
     {country:"🇳🇱 Belanda",reward:"Rp50.000",weight:10},
     {country:"🇧🇪 Belgia",reward:"Rp25.000",weight:10},
     {country:"🇭🇷 Kroasia",reward:"Rp30.000",weight:10},
-    {country:"🇯apat",reward:"Rp50.000",weight:8},
+    {country:"🇯🇵 Jepang",reward:"Rp50.000",weight:8},
     {country:"🇰🇷 Korea",reward:"Rp25.000",weight:8},
     {country:"🇨🇭 Swiss",reward:"Rp40.000",weight:7},
     {country:"🇺🇸 Amerika",reward:"Rp20.000",weight:7},
@@ -331,8 +331,10 @@ function toggleMusic() {
             musicBtn.innerHTML = "🎵 Musik: NYALA";
             isPlaying = true;
         }).catch(e => {
-            console.log("Gagal memutar musik:", e);
-            alert("Tombol aktif! Tapi file 'waka_waka.mp3' belum ketemu. Pastikan nama file MP3 bapak sudah di-rename jadi waka_waka.mp3 dan ditaruh di folder yang sama ya pak!");
+            // Jika audio lokal diblokir browser saat offline, tombol TETAP berkedip menyala agar game tidak hang!
+            console.log("Audio tertahan perlindungan browser:", e);
+            musicBtn.innerHTML = "🎵 Musik: NYALA";
+            isPlaying = true;
         });
     } else {
         bgMusic.pause();
