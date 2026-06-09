@@ -60,6 +60,33 @@ h1{
     opacity:.9;
     margin-bottom:35px;
 }
+
+/* 🎵 TOMBOL MUSIK KAPSUL DI POJOK KANAN ATAS (PERSIS SEPERTI GAMBAR BAPAK) */
+.audio-control {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(13, 21, 37, 0.7); /* Warna gelap transparan premium */
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 22px;
+    border-radius: 50px; /* Bentuk Kapsul Sempurna */
+    cursor: pointer;
+    z-index: 100;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+}
+
+.audio-control:hover {
+    background: rgba(0, 140, 255, 0.8);
+    border-color: #00bfff;
+    transform: translateY(-2px);
+}
  
 .cards{
     display:grid;
@@ -74,7 +101,7 @@ h1{
     cursor:pointer;
 }
 
-/* Efek Hover biar interaktif */
+/* Efek Hover Kartu */
 .card:hover:not(.flip) .card-inner {
     transform: translateY(-10px);
     box-shadow: 0 15px 30px rgba(0,191,255,.6);
@@ -102,14 +129,21 @@ h1{
     display:flex;
     align-items:center;
     justify-content:center;
-    padding:10px;
 }
  
 .front{
-    background: linear-gradient(135deg,#008cff,#0050d8);
-    border:2px solid rgba(255,255,255,.25);
-    box-shadow:0 0 25px rgba(0,191,255,.4);
-    font-size:60px; /* Ukuran pas untuk semua layar HP/Laptop */
+    background: #111;
+    border: 2px solid rgba(255,255,255,.4);
+    box-shadow: 0 0 20px rgba(0,191,255,.3);
+    overflow: hidden;
+}
+
+/* Gambar bendera kotak penuh di sisi depan kartu */
+.front img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 18px;
 }
  
 .back{
@@ -120,6 +154,7 @@ h1{
     font-size:14px;
     font-weight:700;
     border: 3px solid #FFD700;
+    padding: 10px;
 }
  
 .result{
@@ -191,33 +226,11 @@ h1{
     font-weight:700;
     margin-bottom:10px;
 }
-
-/* Tombol Kontrol Musik Mute/Unmute */
-.audio-control {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.6);
-    color: white;
-    border: 2px solid rgba(255,255,255,0.4);
-    padding: 10px 15px;
-    border-radius: 30px;
-    cursor: pointer;
-    z-index: 100;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
-}
-.audio-control:hover {
-    background: rgba(0,140,255,0.8);
-}
 </style>
 </head>
 <body>
- 
-<button class="audio-control" id="muteBtn" onclick="toggleMusic()">
+
+<button class="audio-control" id="musicBtn" onclick="toggleMusic()">
     🎵 Musik: MATI
 </button>
 
@@ -226,13 +239,13 @@ h1{
 <div class="container">
      <div class="badge">🏆 WORLD CUP SPECIAL EVENT</div>
      <h1>⚽ LUCKY FLIP 2026 ⚽</h1>
-     <div class="subtitle">Pilih satu kartu dan menangkan hadiah spesial hingga Rp1.000.000</div>
+     <div class="subtitle">Pilih satu kartu bendera dan menangkan hadiah spesial hingga Rp1.000.000</div>
      <div class="cards" id="cards"></div>
      <div class="result" id="result"></div>
 </div>
  
 <audio id="bgMusic" loop preload="auto">
-    <source src="https://pub-c5e31b5cdafb419a91624d102b9b080c.r2.dev/shakira_waka_waka.mp3" type="audio/mpeg">
+    <source src="waka_waka.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="flipSound" preload="auto">
@@ -248,7 +261,6 @@ h1{
 </audio>
  
 <script>
- 
 const rewards = [
     {country:"🇦🇷 Argentina",reward:"Rp25.000",weight:20},
     {country:"🇧🇷 Brasil",reward:"Rp50.000",weight:18},
@@ -272,14 +284,20 @@ const rewards = [
     {country:"⭐ GOLDEN TROPHY",reward:"Rp1.000.000",weight:1}
 ];
 
-// List 20 bendera aman (Standar ISO) yang dijamin lancar di semua browser
-const cardFlags = [
-    "🇦🇷", "🇧🇷", "🇩🇪", "🇪🇸", "🇫🇷", "🇬🇧", "🇵🇹", "🇳🇱", 
-    "🇧🇪", "🇭🇷", "🇯🇵", "🇰🇷", "🇨🇭", "🇺🇸", "🇲🇽", "🇺🇾",
-    "🇮🇹", "🇲🇦", "🇸🇳", "🇨🇦"
+// Gambar Bendera Kotak Penuh Berkualitas Tinggi
+const flagImages = [
+    "https://flagcdn.com/w320/ar.png", "https://flagcdn.com/w320/br.png", 
+    "https://flagcdn.com/w320/de.png", "https://flagcdn.com/w320/es.png", 
+    "https://flagcdn.com/w320/fr.png", "https://flagcdn.com/w320/gb.png", 
+    "https://flagcdn.com/w320/pt.png", "https://flagcdn.com/w320/nl.png", 
+    "https://flagcdn.com/w320/be.png", "https://flagcdn.com/w320/hr.png", 
+    "https://flagcdn.com/w320/jp.png", "https://flagcdn.com/w320/kr.png", 
+    "https://flagcdn.com/w320/ch.png", "https://flagcdn.com/w320/us.png", 
+    "https://flagcdn.com/w320/mx.png", "https://flagcdn.com/w320/uy.png", 
+    "https://flagcdn.com/w320/it.png", "https://flagcdn.com/w320/ma.png", 
+    "https://flagcdn.com/w320/sn.png", "https://flagcdn.com/w320/ca.png"
 ];
 
-// Fungsi acak urutan bendera
 function shuffleArray(array) {
     let currentIndex = array.length, randomIndex;
     while (currentIndex != 0) {
@@ -290,7 +308,7 @@ function shuffleArray(array) {
     return array;
 }
 
-const shuffledFlags = shuffleArray([...cardFlags]);
+const shuffledFlags = shuffleArray([...flagImages]);
  
 function weightedRandom(){
     const total=rewards.reduce((a,b)=>a+b.weight,0);
@@ -304,32 +322,33 @@ function weightedRandom(){
 const cards=document.getElementById("cards");
 const result=document.getElementById("result");
 const bgMusic=document.getElementById("bgMusic");
-const muteBtn=document.getElementById("muteBtn");
+const musicBtn=document.getElementById("musicBtn");
 let played=false;
-let isMuted=true;
+let isPlaying=false;
 
 bgMusic.volume = 0.5;
 
 function toggleMusic() {
-    if (isMuted) {
+    if (!isPlaying) {
         bgMusic.play().then(() => {
-            muteBtn.innerHTML = "🎵 Musik: NYALA";
-            isMuted = false;
+            musicBtn.innerHTML = "🎵 Musik: NYALA";
+            isPlaying = true;
         }).catch(e => console.log(e));
     } else {
         bgMusic.pause();
-        muteBtn.innerHTML = "🎵 Musik: MATI";
-        isMuted = true;
+        musicBtn.innerHTML = "🎵 Musik: MATI";
+        isPlaying = false;
     }
 }
  
-// Generate 20 kartu ke dalam grid
 for(let i=0;i<20;i++){
     const card=document.createElement("div");
     card.className="card";
     card.innerHTML = `
         <div class="card-inner">
-            <div class="front">${shuffledFlags[i]}</div>
+            <div class="front">
+                <img src="${shuffledFlags[i]}" alt="Bendera Negara">
+            </div>
             <div class="back">🏆<br>Kartu Dibuka</div>
         </div>
     `;
@@ -337,13 +356,6 @@ for(let i=0;i<20;i++){
     card.onclick=()=>{
         if(played) return;
         played=true;
-        
-        if(isMuted) { 
-            bgMusic.play().then(() => {
-                muteBtn.innerHTML = "🎵 Musik: NYALA";
-                isMuted = false;
-            }).catch(e => console.log(e));
-        }
  
         const flipSoundClone = document.getElementById("flipSound").cloneNode(true);
         flipSoundClone.volume = 0.7;
